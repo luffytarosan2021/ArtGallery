@@ -854,61 +854,68 @@ function metricCard(val, label) {
   return `<div class="metric"><div class="metric-val">${val}</div><div class="metric-label">${label}</div></div>`;
 }
 
-
+// A curated list of gallery and museum spaces for the exhibitions
 // ── EXHIBITIONS ───────────────────────────────────────────────
 
-// A curated list of gallery and museum spaces for the exhibitions
 const exhibitionImages = [
-  'https://images.unsplash.com/photo-1536924940846-227afb31e2a5?w=800&q=80', // Gallery interior
-  'https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=800&q=80', // People looking at art
-  'https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?w=800&q=80', // Museum hall
-  // Minimalist & Architectural (Lots of breathing room)
-  'https://images.unsplash.com/photo-1577083552431-6e5fd01988ec?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1543857778-c4a1a3e0b2eb?auto=format&fit=crop&w=800&q=80',
-  
-  // Dramatic Lighting & Contemporary 
-  'https://images.unsplash.com/photo-1620023601555-52b11585eb93?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1578308434771-46903f54d193?auto=format&fit=crop&w=800&q=80',
-  
-  // Wide Open Museum Halls (Great for depth)
-  'https://images.unsplash.com/photo-1563811802951-db322cb4268e?auto=format&fit=crop&w=800&q=80',
+'https://plus.unsplash.com/premium_photo-1664013263421-91e3a8101259?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', 
+ 'https://images.unsplash.com/photo-1543857778-c4a1a3e0b2eb?auto=format&fit=crop&w=800&q=80',
+'https://plus.unsplash.com/premium_photo-1706445408078-7d629e7a3edf?q=80&w=3132&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', 
   'https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?auto=format&fit=crop&w=800&q=80',
-  
-  // Soft, Natural Light Galleries
-  'https://images.unsplash.com/photo-1560211516-7ceab4ba4f5f?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1574182245536-614634cb994f?auto=format&fit=crop&w=800&q=80'
+  'https://images.unsplash.com/photo-1535385793343-27dff1413c5a?q=80&w=1015&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+'https://images.unsplash.com/photo-1569084024058-1632922a4e1d?q=80&w=1019&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+  'https://images.unsplash.com/photo-1536924940846-227afb31e2a5?auto=format&fit=crop&w=800&q=80',
+  'https://plus.unsplash.com/premium_photo-1677609898243-63280b6c89a1?q=80&w=983&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+  'https://images.unsplash.com/photo-1514195037031-83d60ed3b448?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+  'https://images.unsplash.com/photo-1518998053901-5348d3961a04?auto=format&fit=crop&w=800&q=80'
 ];
 
 function loadExhibitions() {
   const exhibitions = [
-    {id:1,name:'Modern Art Expo',start:'Jan 1',end:'Jan 10'},
-    {id:2,name:'Colors of Nature',start:'Feb 1',end:'Feb 15'},
-    {id:3,name:'Abstract World',start:'Mar 5',end:'Mar 20'},
-    {id:4,name:'Digital Vision',start:'Apr 1',end:'Apr 12'},
-    {id:5,name:'Classic Creations',start:'May 1',end:'May 18'},
-    {id:6,name:'Urban Expressions',start:'Jun 1',end:'Jun 14'},
-    {id:7,name:'Heritage Art Show',start:'Jul 1',end:'Jul 15'},
-    {id:8,name:'Modern Masters',start:'Aug 1',end:'Aug 20'},
-    {id:9,name:'Creative Minds',start:'Sep 1',end:'Sep 10'},
-    {id:10,name:'Fusion Fest',start:'Oct 1',end:'Oct 25'}
+    {id:1,name:'Modern Art Expo',start:'Jan 1',end:'Jan 10',year:2026},
+    {id:2,name:'Colors of Nature',start:'Feb 1',end:'Feb 15',year:2026},
+    {id:3,name:'Abstract World',start:'Mar 5',end:'Mar 20',year:2026},
+    {id:4,name:'Digital Vision',start:'Apr 1',end:'Apr 12',year:2026},
+    {id:5,name:'Classic Creations',start:'May 1',end:'May 18',year:2026},
+    {id:6,name:'Urban Expressions',start:'Jun 1',end:'Jun 14',year:2026},
+    {id:7,name:'Heritage Art Show',start:'Jul 1',end:'Jul 15',year:2026},
+    {id:8,name:'Modern Masters',start:'Aug 1',end:'Aug 20',year:2026},
+    {id:9,name:'Creative Minds',start:'Sep 1',end:'Sep 10',year:2026},
+    {id:10,name:'Fusion Fest',start:'Oct 1',end:'Oct 25',year:2026}
   ];
-  
+
+  const now = new Date();
+
   const grid = document.getElementById('exhibitionsGrid');
   if(grid) {
-    grid.innerHTML = exhibitions.map(e=>`
-      <div class="artwork-card" style="cursor:default">
-        <div class="card-art" style="background: url('${exhibitionImages[e.id % exhibitionImages.length]}') center/cover;">
+    grid.innerHTML = exhibitions.map((e, index) => {
+      const startDate = new Date(`${e.start}, ${e.year}`);
+      const endDate = new Date(`${e.end}, ${e.year}`);
+      let statusBadge, opacity;
+      if (now > endDate) {
+        statusBadge = `<span class="badge" style="background:rgba(61,59,55,0.1);color:var(--ink-muted)">Ended</span>`;
+        opacity = 0.75;
+      } else if (now >= startDate) {
+        statusBadge = `<span class="badge status-approved">Active</span>`;
+        opacity = 1;
+      } else {
+        statusBadge = `<span class="badge status-pending">Coming Soon</span>`;
+        opacity = 1;
+      }
+      return `
+      <div class="artwork-card" style="cursor:default; opacity:${opacity}">
+        <div class="card-art" style="background: url('${exhibitionImages[index]}') center/cover;">
         </div>
         <div class="card-body">
           <div class="card-title">${e.name}</div>
-          <div class="card-artist" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--ink-muted)">${e.start} — ${e.end}, 2025</div>
+          <div class="card-artist" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--ink-muted)">${e.start} — ${e.end}, ${e.year}</div>
           <div class="card-footer">
-            <span class="badge status-approved">Active</span>
+            ${statusBadge}
             <span class="card-cat">Exhibition</span>
           </div>
-        </div>
       </div>
-    `).join('');
+      </div>
+    `}).join('');
   }
 }
 
