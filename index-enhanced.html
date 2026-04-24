@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArtGallery - Premium Art Marketplace</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/styles-enhanced.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="#/" class="navbar-logo">🎨 ArtGallery</a>
+            <div class="navbar-menu" id="navbarMenu">
+                <a href="#/" class="nav-link">Home</a>
+                <a href="#/explore" class="nav-link">Gallery</a>
+                <a href="#/search" class="nav-link">Search</a>
+                <a href="#/wishlist" class="nav-link">❤️ Wishlist</a>
+                <span id="authNav"></span>
+            </div>
+            <button class="hamburger" id="hamburger">☰</button>
+        </div>
+    </nav>
+
+    <!-- Main App Container -->
+    <main id="app" class="app-container">
+        <!-- Content will be dynamically loaded here -->
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>ArtGallery</h4>
+                <p>The premier marketplace for discovering and collecting fine art from talented artists worldwide.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Explore</h4>
+                <ul>
+                    <li><a href="#/">Home</a></li>
+                    <li><a href="#/explore">Browse Gallery</a></li>
+                    <li><a href="#/search">Advanced Search</a></li>
+                    <li><a href="#/wishlist">My Wishlist</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>For Artists</h4>
+                <ul>
+                    <li><a href="#/artist">Dashboard</a></li>
+                    <li><a href="#/register">Join as Artist</a></li>
+                    <li><a href="#">How to Sell</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Community</h4>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 ArtGallery. All rights reserved. | <a href="#">Privacy</a> | <a href="#">Terms</a></p>
+        </div>
+    </footer>
+
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script src="js/api.js"></script>
+    <script src="js/pages.js"></script>
+    <script src="js/pages-enhanced.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/app-enhanced.js"></script>
+</body>
+</html>

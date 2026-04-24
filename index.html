@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ArtVault — Art Gallery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#C9A84C;--gold-light:#E8D5A0;--gold-dark:#8B6914;
+  --ink:#0D0C0A;--ink-soft:#1A1917;--ink-muted:#3D3B37;
+  --parchment:#FAF7F2;--parchment-dark:#F0EBE0;--parchment-mid:#E8E0D0;
+  --cream:#FFFDF8;
+  --red:#9B2335;--green:#2A5C3F;--blue:#1D3A6E;
+  --shadow:0 2px 20px rgba(13,12,10,0.12);
+  --shadow-lg:0 8px 48px rgba(13,12,10,0.18);
+  --r:6px;--r-lg:12px;
+  --nav-h:68px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:var(--parchment);color:var(--ink);min-height:100vh;font-size:15px;line-height:1.6}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;height:var(--nav-h);background:rgba(250,247,242,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--parchment-mid);z-index:1000;display:flex;align-items:center;justify-content:space-between;padding:0 32px}
+.nav-logo{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:300;letter-spacing:2px;color:var(--ink);text-decoration:none}
+.nav-logo span{color:var(--gold);font-style:italic}
+.nav-links{display:flex;align-items:center;gap:8px}
+.nav-links a,.nav-links button{font-family:'Outfit',sans-serif;font-size:13px;font-weight:400;color:var(--ink-muted);text-decoration:none;padding:7px 16px;border-radius:var(--r);border:none;background:transparent;cursor:pointer;transition:.2s;letter-spacing:.3px}
+.nav-links a:hover,.nav-links button:hover{color:var(--ink);background:var(--parchment-dark)}
+.nav-links .btn-primary{background:var(--ink);color:var(--cream);border-radius:var(--r);font-weight:500}
+.nav-links .btn-primary:hover{background:var(--ink-muted)}
+.nav-links .btn-outline{border:1px solid var(--ink-muted);color:var(--ink)}
+.nav-links .btn-outline:hover{background:var(--ink);color:var(--cream)}
+#userBadge{display:none;font-size:12px;color:var(--gold-dark);background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.3);padding:5px 12px;border-radius:20px;font-weight:500}
+
+/* ── LAYOUT ── */
+main{padding-top:var(--nav-h);min-height:100vh}
+.page{display:none;animation:fadeIn .3s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.container{max-width:1100px;margin:0 auto;padding:0 24px}
+
+/* ── HERO ── */
+.hero{background:var(--ink);color:var(--cream);padding:100px 0 80px;text-align:center;position:relative;overflow:hidden}
+/* FIXED: Added pointer-events: none so the background doesn't block button clicks */
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 50%,rgba(201,168,76,.08) 0%,transparent 70%); pointer-events: none;}
+.hero-tag{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-bottom:24px}
+.hero h1{font-family:'Cormorant Garamond',serif;font-size:clamp(3rem,6vw,5.5rem);font-weight:300;line-height:1.05;margin-bottom:24px;letter-spacing:-1px}
+.hero h1 em{font-style:italic;color:var(--gold-light)}
+.hero p{font-size:1.1rem;color:rgba(255,253,248,.65);max-width:480px;margin:0 auto 40px;font-weight:300}
+.hero-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;position:relative;z-index:2;} /* Brought buttons to front */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:var(--r);font-family:'Outfit',sans-serif;font-size:14px;font-weight:500;cursor:pointer;border:none;transition:.2s;text-decoration:none;letter-spacing:.3px}
+.btn-gold{background:var(--gold);color:var(--ink)}
+.btn-gold:hover{background:var(--gold-light)}
+.btn-ghost{background:transparent;color:var(--cream);border:1px solid rgba(255,253,248,.3)}
+.btn-ghost:hover{background:rgba(255,253,248,.08)}
+.btn-dark{background:var(--ink);color:var(--cream)}
+.btn-dark:hover{background:var(--ink-muted)}
+.btn-sm{padding:8px 18px;font-size:13px}
+.btn-danger{background:var(--red);color:#fff}
+.btn-danger:hover{opacity:.85}
+
+/* ── STATS BAR ── */
+.stats-bar{background:var(--cream);border-bottom:1px solid var(--parchment-mid);padding:28px 0}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--parchment-mid)}
+.stat-cell{background:var(--cream);padding:20px 32px;text-align:center}
+.stat-num{font-family:'Cormorant Garamond',serif;font-size:2.4rem;font-weight:300;color:var(--gold-dark);line-height:1}
+.stat-label{font-size:12px;color:var(--ink-muted);letter-spacing:1px;text-transform:uppercase;margin-top:4px;font-family:'DM Mono',monospace}
+
+/* ── SECTION ── */
+.section{padding:72px 0}
+.section-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:40px;gap:16px}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:2.4rem;font-weight:300;line-height:1.1}
+.section-title span{font-style:italic;color:var(--gold-dark)}
+.section-link{font-size:13px;color:var(--gold-dark);text-decoration:none;font-family:'DM Mono',monospace;letter-spacing:.5px;white-space:nowrap}
+.section-link:hover{text-decoration:underline}
+
+/* ── ARTWORK GRID ── */
+.artwork-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px}
+.artwork-card{background:var(--cream);border:1px solid var(--parchment-mid);border-radius:var(--r-lg);overflow:hidden;transition:.25s;cursor:pointer}
+.artwork-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-3px)}
+.card-art{height:200px;background:var(--parchment-dark);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.card-art-bg{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:4rem;color:rgba(13,12,10,.06)}
+.card-art-label{position:absolute;bottom:10px;right:10px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;padding:3px 8px;border-radius:3px}
+.status-approved{background:rgba(42,92,63,.1);color:var(--green)}
+.status-pending{background:rgba(201,168,76,.15);color:var(--gold-dark)}
+.status-rejected{background:rgba(155,35,53,.1);color:var(--red)}
+.card-body{padding:16px 20px 20px}
+.card-title{font-family:'Cormorant Garamond',serif;font-size:1.35rem;font-weight:400;margin-bottom:4px;line-height:1.2}
+.card-artist{font-size:12px;color:var(--ink-muted);margin-bottom:12px;font-family:'DM Mono',monospace}
+.card-footer{display:flex;align-items:center;justify-content:space-between}
+.card-price{font-size:1.1rem;font-weight:600;color:var(--ink);font-family:'Cormorant Garamond',serif}
+.card-cat{font-size:11px;color:var(--ink-muted);background:var(--parchment-dark);padding:3px 10px;border-radius:20px}
+
+/* ── FORM ── */
+.form-page{background:var(--cream);min-height:100vh;padding:60px 0}
+.form-box{max-width:480px;margin:0 auto;background:#fff;border:1px solid var(--parchment-mid);border-radius:var(--r-lg);padding:40px 44px;box-shadow:var(--shadow)}
+.form-box h2{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;margin-bottom:6px}
+.form-box p.sub{font-size:13px;color:var(--ink-muted);margin-bottom:32px}
+.field{margin-bottom:20px}
+.field label{display:block;font-size:12px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;color:var(--ink-muted);margin-bottom:6px;font-family:'DM Mono',monospace}
+.field input,.field select,.field textarea{width:100%;padding:11px 14px;border:1px solid var(--parchment-mid);border-radius:var(--r);font-family:'Outfit',sans-serif;font-size:14px;color:var(--ink);background:var(--parchment);transition:.2s;outline:none}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold);background:#fff}
+.field textarea{resize:vertical;min-height:90px}
+.form-footer{margin-top:8px;font-size:13px;color:var(--ink-muted);text-align:center}
+.form-footer a{color:var(--gold-dark);text-decoration:none;font-weight:500}
+
+/* ── DASHBOARD ── */
+.dash-wrap{max-width:1100px;margin:0 auto;padding:40px 24px}
+.dash-header{margin-bottom:36px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.dash-title{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:300}
+.dash-sub{font-size:13px;color:var(--ink-muted);font-family:'DM Mono',monospace;margin-top:4px}
+.dash-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:36px}
+.metric{background:#fff;border:1px solid var(--parchment-mid);border-radius:var(--r-lg);padding:20px 24px}
+.metric-val{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:300;color:var(--gold-dark);line-height:1}
+.metric-label{font-size:11px;color:var(--ink-muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px;font-family:'DM Mono',monospace}
+
+/* ── TABLE ── */
+.table-wrap{background:#fff;border:1px solid var(--parchment-mid);border-radius:var(--r-lg);overflow:hidden}
+.table-wrap table{width:100%;border-collapse:collapse}
+.table-wrap th{background:var(--parchment);font-size:11px;font-family:'DM Mono',monospace;letter-spacing:.8px;text-transform:uppercase;color:var(--ink-muted);padding:12px 20px;text-align:left;font-weight:400;border-bottom:1px solid var(--parchment-mid)}
+.table-wrap td{padding:14px 20px;border-bottom:1px solid var(--parchment-mid);font-size:14px;vertical-align:middle}
+.table-wrap tr:last-child td{border-bottom:none}
+.table-wrap tr:hover td{background:var(--parchment)}
+.actions{display:flex;gap:8px}
+.badge{display:inline-block;font-size:11px;font-family:'DM Mono',monospace;padding:3px 10px;border-radius:20px;letter-spacing:.5px}
+
+/* ── MODAL ── */
+.modal-bg{position:fixed;inset:0;background:rgba(13,12,10,.6);z-index:2000;display:flex;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(4px)}
+.modal{background:#fff;border-radius:var(--r-lg);max-width:500px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg)}
+.modal-head{padding:28px 32px 0;border-bottom:1px solid var(--parchment-mid);padding-bottom:20px;display:flex;align-items:flex-start;justify-content:space-between}
+.modal-title{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:300}
+.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--ink-muted);padding:4px;line-height:1}
+.modal-close:hover{color:var(--ink)}
+.modal-body{padding:24px 32px 32px}
+.detail-row{display:flex;gap:16px;margin-bottom:14px;align-items:baseline}
+.detail-key{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.5px;color:var(--ink-muted);text-transform:uppercase;min-width:110px;flex-shrink:0}
+.detail-val{font-size:14px;color:var(--ink)}
+
+/* ── TOAST ── */
+.toast-container{position:fixed;bottom:24px;right:24px;z-index:3000;display:flex;flex-direction:column;gap:8px}
+.toast{background:var(--ink);color:var(--cream);padding:12px 20px;border-radius:var(--r);font-size:13px;box-shadow:var(--shadow);animation:slideUp .3s ease;max-width:320px}
+.toast.success{border-left:3px solid var(--green)}
+.toast.error{border-left:3px solid var(--red)}
+.toast.info{border-left:3px solid var(--gold)}
+@keyframes slideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── SEARCH / FILTER ── */
+.filters{display:flex;gap:12px;margin-bottom:28px;flex-wrap:wrap;align-items:center}
+.search-input{flex:1;min-width:200px;padding:10px 16px;border:1px solid var(--parchment-mid);border-radius:var(--r);font-family:'Outfit',sans-serif;font-size:14px;background:var(--cream);color:var(--ink);outline:none;transition:.2s}
+.search-input:focus{border-color:var(--gold);background:#fff}
+.filter-select{padding:10px 14px;border:1px solid var(--parchment-mid);border-radius:var(--r);font-family:'Outfit',sans-serif;font-size:13px;background:var(--cream);color:var(--ink);outline:none;cursor:pointer}
+
+/* ── EMPTY STATE ── */
+.empty{text-align:center;padding:60px 20px;color:var(--ink-muted)}
+.empty-icon{font-family:'Cormorant Garamond',serif;font-size:4rem;margin-bottom:16px;opacity:.3;color:var(--ink)}
+.empty h3{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:300;margin-bottom:8px;color:var(--ink)}
+.empty p{font-size:13px}
+
+/* ── ARTWORK DETAIL ── */
+.detail-hero{background:var(--ink);padding:60px 0;color:var(--cream)}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start}
+.detail-art-frame{background:var(--ink-soft);border-radius:var(--r-lg);aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:6rem;color:rgba(255,253,248,.05)}
+.detail-info h1{font-family:'Cormorant Garamond',serif;font-size:3rem;font-weight:300;line-height:1.05;margin-bottom:8px}
+.detail-info .artist{font-family:'DM Mono',monospace;font-size:12px;color:rgba(255,253,248,.5);letter-spacing:1px;margin-bottom:24px}
+.detail-info .price{font-family:'Cormorant Garamond',serif;font-size:2.2rem;color:var(--gold-light);margin-bottom:28px}
+.detail-info .desc{font-size:14px;color:rgba(255,253,248,.7);line-height:1.8;margin-bottom:32px}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--parchment-mid);margin-bottom:32px}
+.tab-btn{padding:12px 24px;background:none;border:none;border-bottom:2px solid transparent;font-family:'Outfit',sans-serif;font-size:14px;font-weight:400;color:var(--ink-muted);cursor:pointer;transition:.2s;margin-bottom:-1px}
+.tab-btn.active{color:var(--ink);border-bottom-color:var(--gold);font-weight:500}
+.tab-btn:hover{color:var(--ink)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  nav{padding:0 16px}
+  .nav-links a:not(.btn-primary):not(.btn-outline){display:none}
+  .hero{padding:60px 16px 50px}
+  .hero h1{font-size:2.8rem}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .detail-grid{grid-template-columns:1fr}
+  .form-box{padding:28px 24px}
+  .dash-wrap{padding:24px 16px}
+}
+@media(max-width:480px){
+  .artwork-grid{grid-template-columns:1fr}
+  .stats-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#home-top" onclick="showPage('home')" class="nav-logo">Art<span>Vault</span></a>
+  <div class="nav-links">
+    <a href="#home-top" onclick="showPage('home')">Home</a>
+    <a href="#about-section" onclick="showPage('home')">About Us</a>
+    <a href="#featured-section" onclick="showPage('home')">Featured Works</a>
+    <a href="#exhibitions-section" onclick="showPage('home')">Exhibitions</a>
+    <a href="#contact-section" onclick="showPage('home')">Contact Us</a>
+    
+    <span id="userBadge"></span>
+    <a href="#" onclick="showDashboard()" id="navDash" style="display:none">Dashboard</a>
+    <button onclick="handleLogout()" id="navLogout" style="display:none; border: 1px solid var(--ink-muted);">Sign Out</button>
+    <a href="#" onclick="showPage('login')" id="navLogin" class="btn-outline btn">Log In</a>
+    <a href="#" onclick="showPage('register')" id="navRegister" class="btn-primary btn">Join</a>
+  </div>
+</nav>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<main>
+
+<div id="page-home" class="page active">
+  
+  <div id="home-top" class="hero">
+    <div class="container">
+      <p class="hero-tag">Curated Digital Collection</p>
+      <h1>Where <em>Art</em> Meets<br>Discovery</h1>
+      <p>Browse thousands of original artworks from verified artists. Enquire, collect, and connect.</p>
+      <div class="hero-actions">
+        <button class="btn btn-gold" onclick="showPage('explore')">Browse Gallery</button>
+        <button class="btn btn-ghost" onclick="showPage('register')">Become an Artist</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="about-section" class="section" style="background:var(--cream);">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Our <span>Story</span></h2>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 48px; align-items: center;">
+        <div>
+          <h3 style="font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 300; line-height: 1.2; margin-bottom: 20px;">Bridging the gap between talented creators and passionate collectors.</h3>
+          <p style="color: var(--ink-muted); margin-bottom: 16px; font-size: 15px; line-height: 1.8;">ArtVault was founded on a simple principle: art should be accessible, and artists should be empowered. We provide a curated digital space where talented artists from around the globe can showcase their original works without the traditional barriers of physical galleries.</p>
+          <p style="color: var(--ink-muted); font-size: 15px; line-height: 1.8;">Whether you are a seasoned curator, an interior designer, or someone acquiring your very first piece, our gallery ensures a trusted, seamless environment for artistic discovery and connection. Every piece in our collection is carefully vetted to guarantee authenticity and quality.</p>
+        </div>
+        <div style="background: url('https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=800&q=80') center/cover; aspect-ratio: 4/5; border-radius: var(--r-lg); border: 1px solid var(--parchment-mid);">
+        </div>        
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="container">
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-cell"><div class="stat-num" id="statArtworks">—</div><div class="stat-label">Artworks</div></div>
+        <div class="stat-cell"><div class="stat-num" id="statArtists">—</div><div class="stat-label">Artists</div></div>
+        <div class="stat-cell"><div class="stat-num" id="statCategories">—</div><div class="stat-label">Categories</div></div>
+        <div class="stat-cell"><div class="stat-num" id="statExhibitions">—</div><div class="stat-label">Exhibitions</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="featured-section" class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Featured <span>Works</span></h2>
+        <a href="#" onclick="showPage('explore')" class="section-link">View all →</a>
+      </div>
+      <div class="artwork-grid" id="featuredGrid">
+        <div class="empty"><div class="empty-icon">◈</div><p>Loading artworks…</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="exhibitions-section" class="section" style="background:var(--cream);">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Current <span>Exhibitions</span></h2>
+      </div>
+      <div id="exhibitionsGrid" class="artwork-grid">
+        <div class="empty"><div class="empty-icon">◈</div><p>Loading exhibitions…</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="contact-section" class="section" style="padding-bottom:100px;">
+    <div class="container">
+      <div style="text-align: center; margin-bottom: 48px;">
+        <h2 class="section-title" style="margin-bottom: 8px;">Get in <span>Touch</span></h2>
+        <p style="color: var(--ink-muted);">We would love to hear from you. Reach out with any questions, partnership inquiries, or support requests.</p>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 32px; max-width: 900px; margin: 0 auto;">
+        
+        <div style="background: var(--ink); color: var(--cream); padding: 40px; border-radius: var(--r-lg); box-shadow: var(--shadow-lg);">
+          <h3 style="font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 300; margin-bottom: 28px; color: var(--gold-light);">Contact Details</h3>
+          
+          <div style="margin-bottom: 24px;">
+            <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,253,248,0.5); margin-bottom: 4px;">✉️ Email</div>
+            <div style="font-size: 15px; color: rgba(255,253,248,0.9);">artvault@gmail.com</div>
+          </div>
+          
+          <div style="margin-bottom: 32px;">
+            <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,253,248,0.5); margin-bottom: 4px;">📞 Phone</div>
+            <div style="font-size: 15px; color: rgba(255,253,248,0.9);">+91 00000 00123</div>
+          </div>
+          
+          <div style="border-top: 1px solid rgba(255,253,248,0.1); padding-top: 24px;">
+            <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,253,248,0.5); margin-bottom: 4px;">🕒 Gallery Hours</div>
+            <div style="font-size: 14px; color: rgba(255,253,248,0.7);">Tuesday - Sunday: 10:00 AM - 6:00 PM<br>Monday: Closed</div>
+          </div>
+        </div>
+        
+        <div class="form-box" style="margin: 0; max-width: 100%; box-shadow: var(--shadow);">
+          <h2 style="font-size: 1.8rem; margin-bottom: 24px;">Send a Message</h2>
+          <div class="field">
+            <label>Your Name</label>
+            <input type="text" placeholder="Enter your full name">
+          </div>
+          <div class="field">
+            <label>Email Address</label>
+            <input type="email" placeholder="you@example.com">
+          </div>
+          <div class="field">
+            <label>Subject</label>
+            <input type="text" placeholder="What is this regarding?">
+          </div>
+          <div class="field">
+            <label>Message</label>
+            <textarea placeholder="Write your message here..." style="min-height: 120px;"></textarea>
+          </div>
+          <button class="btn btn-dark" style="width: 100%; justify-content: center; margin-top: 8px;" onclick="toast('Message sent successfully! We will get back to you soon.', 'success')">Send Message</button>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="page-explore" class="page">
+  <div class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">The <span>Gallery</span></h2>
+      </div>
+      <div class="filters">
+        <input class="search-input" type="text" id="searchInput" placeholder="Search artworks, artists…" oninput="filterArtworks()">
+        <select class="filter-select" id="filterStatus" onchange="filterArtworks()">
+          <option value="">All Status</option>
+          <option value="approved">Approved</option>
+          <option value="pending">Pending</option>
+          <option value="rejected">Rejected</option>
+        </select>
+      </div>
+      <div class="artwork-grid" id="exploreGrid">
+        <div class="empty"><div class="empty-icon">◈</div><p>Loading…</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="page-login" class="page form-page">
+  <div class="container">
+    <div class="form-box">
+      <h2>Welcome Back</h2>
+      <p class="sub">Sign in to your ArtVault account</p>
+      <div class="field"><label>Email</label><input type="email" id="loginEmail" placeholder="you@example.com"></div>
+      <div class="field"><label>Password</label><input type="password" id="loginPass" placeholder="••••••••"></div>
+      <button class="btn btn-dark" style="width:100%;justify-content:center;margin-top:8px" onclick="handleLogin()">Sign In</button>
+      <p class="form-footer" style="margin-top:20px">No account? <a href="#" onclick="showPage('register')">Create one →</a></p>
+      <div style="margin-top:16px;padding:12px 16px;background:var(--parchment);border-radius:var(--r);font-size:12px;font-family:'DM Mono',monospace;color:var(--ink-muted)">
+        <strong>Demo credentials:</strong><br>
+        Admin: admin1@gmail.com / admin123<br>
+        Artist: aarav@gmail.com / pass123<br>
+        Visitor: vikram@gmail.com / pass123
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="page-register" class="page form-page">
+  <div class="container">
+    <div class="form-box">
+      <h2>Join ArtVault</h2>
+      <p class="sub">Create your account and start exploring</p>
+      <div class="field"><label>Full Name</label><input type="text" id="regName" placeholder="Your name"></div>
+      <div class="field"><label>Email</label><input type="email" id="regEmail" placeholder="you@example.com"></div>
+      <div class="field"><label>Password</label><input type="password" id="regPass" placeholder="Min 6 characters"></div>
+      <div class="field">
+        <label>I am a</label>
+        <select id="regRole">
+          <option value="visitor">Visitor — I love exploring art</option>
+          <option value="artist">Artist — I create artworks</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      <button class="btn btn-dark" style="width:100%;justify-content:center;margin-top:8px" onclick="handleRegister()">Create Account</button>
+      <p class="form-footer" style="margin-top:20px">Have an account? <a href="#" onclick="showPage('login')">Sign in →</a></p>
+    </div>
+  </div>
+</div>
+
+<div id="page-admin" class="page">
+  <div class="dash-wrap">
+    <div class="dash-header">
+      <div>
+        <div class="dash-title">Admin Dashboard</div>
+        <div class="dash-sub">Manage artworks, users & enquiries</div>
+      </div>
+    </div>
+    <div class="dash-metrics" id="adminMetrics"></div>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('artworksTab','tab-artworks')">Artworks</button>
+      <button class="tab-btn" onclick="switchTab('enquiriesTab','tab-enquiries')">Enquiries</button>
+      <button class="tab-btn" onclick="switchTab('usersTab','tab-users')">Users</button>
+    </div>
+    <div id="tab-artworks" class="tab-content active">
+      <div class="table-wrap"><table><thead><tr><th>ID</th><th>Title</th><th>Artist</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead><tbody id="adminArtworksBody"></tbody></table></div>
+    </div>
+    <div id="tab-enquiries" class="tab-content">
+      <div class="table-wrap"><table><thead><tr><th>ID</th><th>From</th><th>Artwork</th><th>Message</th><th>Status</th></tr></thead><tbody id="adminEnquiriesBody"></tbody></table></div>
+    </div>
+    <div id="tab-users" class="tab-content">
+      <div class="table-wrap"><table><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Status</th></tr></thead><tbody id="adminUsersBody"></tbody></table></div>
+    </div>
+  </div>
+</div>
+
+<div id="page-artist" class="page">
+  <div class="dash-wrap">
+    <div class="dash-header">
+      <div>
+        <div class="dash-title">Artist Studio</div>
+        <div class="dash-sub">Your artworks & submissions</div>
+      </div>
+      <button class="btn btn-dark btn-sm" onclick="showUploadModal()">+ Upload Artwork</button>
+    </div>
+    <div class="dash-metrics" id="artistMetrics"></div>
+    <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:300;margin-bottom:20px">Your <em>Artworks</em></h3>
+    <div class="table-wrap"><table><thead><tr><th>Title</th><th>Category</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead><tbody id="artistArtworksBody"></tbody></table></div>
+  </div>
+</div>
+
+<div id="page-visitor" class="page">
+  <div class="dash-wrap">
+    <div class="dash-header">
+      <div>
+        <div class="dash-title">My Collection</div>
+        <div class="dash-sub">Your enquiries & saved artworks</div>
+      </div>
+    </div>
+    <div id="visitorEnquiries">
+      <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:300;margin-bottom:20px">Browse the <em>Gallery</em></h3>
+      <div class="artwork-grid" id="visitorGrid"></div>
+    </div>
+  </div>
+</div>
+
+<div id="page-detail" class="page">
+  <div id="detailContent"></div>
+</div>
+
+</main>
+
+<div id="uploadModal" style="display:none">
+  <div class="modal-bg" onclick="closeUploadModal(event)">
+    <div class="modal">
+      <div class="modal-head">
+        <div class="modal-title">Upload Artwork</div>
+        <button class="modal-close" onclick="closeUploadModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="field"><label>Title</label><input type="text" id="uploadTitle" placeholder="Artwork title"></div>
+        <div class="field">
+          <label>Category</label>
+          <select id="uploadCategory">
+            <option value="">— Select Category —</option>
+            <option value="1">Painting</option>
+            <option value="2">Digital Art</option>
+            <option value="3">Landscape</option>
+          </select>
+        </div>
+        <div class="field"><label>Price (₹)</label><input type="number" id="uploadPrice" placeholder="e.g. 5000" min="1"></div>
+        <div style="display:flex;gap:12px;margin-top:8px">
+          <button class="btn btn-dark" style="flex:1;justify-content:center" onclick="submitArtwork()">Submit for Review</button>
+          <button class="btn btn-ghost" style="color:var(--ink);border-color:var(--parchment-mid)" onclick="closeUploadModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="enquiryModal" style="display:none">
+  <div class="modal-bg" onclick="closeEnquiryModal(event)">
+    <div class="modal">
+      <div class="modal-head">
+        <div class="modal-title">Send Enquiry</div>
+        <button class="modal-close" onclick="closeEnquiryModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:13px;color:var(--ink-muted);margin-bottom:20px">Send a message to the artist about this artwork.</p>
+        <div class="field"><label>Your Message</label><textarea id="enquiryMsg" placeholder="I'm interested in this artwork. Can you tell me more about…"></textarea></div>
+        <input type="hidden" id="enquiryArtworkId">
+        <div style="display:flex;gap:12px">
+          <button class="btn btn-dark" style="flex:1;justify-content:center" onclick="submitEnquiry()">Send Enquiry</button>
+          <button class="btn btn-ghost" style="color:var(--ink);border-color:var(--parchment-mid)" onclick="closeEnquiryModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'http://localhost:5001/api';
+let currentUser = null;
+let allArtworks = [];
+let artworkColors = ['#E8D5A0','#D4C4A8','#C5B89A','#B8A88C','#D2C4B0','#E0D4C0','#C8B89A','#D6CAB6'];
+
+// ── 1. IMAGE MAP (Matches Database Titles to Local Files) ──────
+const imageMap = {
+  "greenvalley": "./GreenValley.jpeg",
+  "neonlights": "./NeonLight.jpg",
+  "pixelworld": "./PixelWorld.jpeg",
+  "sunsetbliss": "./SunsetBliss.jpg"
+};
+
+// Helper function to get the correct image
+function getImageUrl(title) {
+  if (!title) return './GreenValley.jpeg';
+  // This line strips out spaces and uppercase letters so it matches perfectly
+  const cleanTitle = title.toLowerCase().replace(/\s+/g, '');
+  return imageMap[cleanTitle] || './GreenValley.jpeg';
+}
+
+// ── AUTH ──────────────────────────────────────────────────────
+async function init() {
+  const token = localStorage.getItem('token');
+  const user = localStorage.getItem('user');
+  
+  loadExhibitions(); 
+
+  if (token && user) {
+    currentUser = JSON.parse(user);
+    updateNavAuth();
+    loadStats();
+    loadFeaturedArtworks();
+    loadExplore();
+  } else {
+    loadStats();
+    loadFeaturedArtworks();
+    loadExplore();
+  }
+}
+
+function updateNavAuth() {
+  const badge = document.getElementById('userBadge');
+  const dash = document.getElementById('navDash');
+  const logout = document.getElementById('navLogout');
+  const login = document.getElementById('navLogin');
+  const reg = document.getElementById('navRegister');
+  if (currentUser) {
+    badge.style.display = 'inline-block';
+    badge.textContent = currentUser.name;
+    dash.style.display = 'inline-block';
+    logout.style.display = 'inline-block';
+    login.style.display = 'none';
+    reg.style.display = 'none';
+  } else {
+    badge.style.display = 'none';
+    dash.style.display = 'none';
+    logout.style.display = 'none';
+    login.style.display = 'inline-flex';
+    reg.style.display = 'inline-flex';
+  }
+}
+
+async function handleLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  if (!email || !pass) return toast('Please fill all fields','error');
+  try {
+    const r = await fetch(`${API}/auth/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass})});
+    const d = await r.json();
+    if (!d.success) return toast(d.error||'Login failed','error');
+    localStorage.setItem('token',d.token);
+    localStorage.setItem('user',JSON.stringify(d.user));
+    currentUser = d.user;
+    updateNavAuth();
+    toast(`Welcome back, ${d.user.name}!`,'success');
+    showDashboard();
+  } catch(e) { toast('Cannot connect to server. Is backend running?','error'); }
+}
+
+async function handleRegister() {
+  const name = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const pass = document.getElementById('regPass').value;
+  const role = document.getElementById('regRole').value;
+  if (!name||!email||!pass) return toast('Please fill all fields','error');
+  if (pass.length < 4) return toast('Password too short','error');
+  try {
+    const r = await fetch(`${API}/auth/register`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,password:pass,role})});
+    const d = await r.json();
+    if (!d.success) return toast(d.error||'Registration failed','error');
+    localStorage.setItem('token',d.token);
+    localStorage.setItem('user',JSON.stringify(d.user));
+    currentUser = d.user;
+    updateNavAuth();
+    toast(`Welcome, ${d.user.name}!`,'success');
+    showDashboard();
+  } catch(e) { toast('Cannot connect to server. Is backend running?','error'); }
+}
+
+function handleLogout() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  currentUser = null;
+  updateNavAuth();
+  showPage('home');
+  window.scrollTo(0,0);
+  toast('Signed out successfully','info');
+}
+
+// ── DATA ──────────────────────────────────────────────────────
+async function loadStats() {
+  try {
+    const r = await fetch(`${API}/artworks/artist`);
+    const d = await r.json();
+    if (d.success) {
+      const artworks = d.data;
+      const artists = [...new Set(artworks.map(a=>a.artist_name))].length;
+      document.getElementById('statArtworks').textContent = artworks.length;
+      document.getElementById('statArtists').textContent = artists;
+      document.getElementById('statCategories').textContent = '3';
+      document.getElementById('statExhibitions').textContent = '10';
+    }
+  } catch(e) {
+    document.getElementById('statArtworks').textContent = '7';
+    document.getElementById('statArtists').textContent = '4';
+    document.getElementById('statCategories').textContent = '3';
+    document.getElementById('statExhibitions').textContent = '10';
+  }
+}
+
+async function loadFeaturedArtworks() {
+  try {
+    const r = await fetch(`${API}/artworks/artist`);
+    const d = await r.json();
+    allArtworks = d.success ? d.data : [];
+    const approved = allArtworks.filter(a=>a.approval_status==='approved').slice(0,6);
+    document.getElementById('featuredGrid').innerHTML = approved.length
+      ? approved.map(a=>artworkCard(a)).join('')
+      : '<div class="empty"><div class="empty-icon">◈</div><p>No approved artworks yet</p></div>';
+  } catch(e) {
+    document.getElementById('featuredGrid').innerHTML = '<div class="empty"><div class="empty-icon">◈</div><p>Backend offline — artworks unavailable</p></div>';
+  }
+}
+
+async function loadExplore() {
+  try {
+    const r = await fetch(`${API}/artworks/artist`);
+    const d = await r.json();
+    allArtworks = d.success ? d.data : [];
+    renderExplore(allArtworks);
+  } catch(e) {
+    document.getElementById('exploreGrid').innerHTML = '<div class="empty"><div class="empty-icon">◈</div><p>Backend offline</p></div>';
+  }
+}
+
+function renderExplore(artworks) {
+  document.getElementById('exploreGrid').innerHTML = artworks.length
+    ? artworks.map(a=>artworkCard(a)).join('')
+    : '<div class="empty"><div class="empty-icon">◈</div><h3>No artworks found</h3><p>Try adjusting filters</p></div>';
+}
+
+function filterArtworks() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const status = document.getElementById('filterStatus').value;
+  let filtered = allArtworks;
+  if (q) filtered = filtered.filter(a=>(a.title||'').toLowerCase().includes(q)||(a.artist_name||'').toLowerCase().includes(q));
+  if (status) filtered = filtered.filter(a=>a.approval_status===status);
+  renderExplore(filtered);
+}
+
+// ── 2. UPDATED CARD GENERATOR ─────────────────────────────────
+function artworkCard(a) {
+  // Uses the map to grab the correct image
+  const imageUrl = getImageUrl(a.title);
+
+  return `<div class="artwork-card" onclick="showDetail(${a.artwork_id})">
+    <div class="card-art" style="background: url('${imageUrl}') center/cover;">
+      <span class="card-art-label badge status-${a.approval_status||'pending'}">${a.approval_status||'pending'}</span>
+    </div>
+    <div class="card-body">
+      <div class="card-title">${a.title||'Untitled'}</div>
+      <div class="card-artist">${a.artist_name||'Unknown Artist'}${a.verified_status==='verified'?' · ✓':''}</div>
+      <div class="card-footer">
+        <div class="card-price">₹${Number(a.price||0).toLocaleString('en-IN')}</div>
+        <span class="card-cat">${a.category||'Art'}</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── 3. UPDATED DETAIL VIEW ────────────────────────────────────
+async function showDetail(id) {
+  showPage('detail');
+  window.scrollTo(0,0);
+  try {
+    const r = await fetch(`${API}/artworks/${id}`);
+    const d = await r.json();
+    const a = d.data;
+    
+    // Uses the map to grab the correct image
+    const imageUrl = getImageUrl(a.title);
+
+    document.getElementById('detailContent').innerHTML = `
+      <div class="detail-hero">
+        <div class="container">
+          <div class="detail-grid">
+            <div class="detail-art-frame" style="background: url('${imageUrl}') center/cover; box-shadow: var(--shadow-lg);"></div>
+            <div class="detail-info">
+              <span class="badge status-${a.approval_status}" style="margin-bottom:16px;display:inline-block">${a.approval_status}</span>
+              <h1>${a.title||'Untitled'}</h1>
+              <div class="artist">By ${a.artist_name||'Unknown'} ${a.verified_status==='verified'?'· Verified Artist':''}</div>
+              <div class="price">₹${Number(a.price||0).toLocaleString('en-IN')}</div>
+              <div class="desc">${a.bio||'No artist bio available.'}</div>
+              ${currentUser&&currentUser.role==='visitor'?`<button class="btn btn-gold" onclick="openEnquiryModal(${a.artwork_id})">Send Enquiry</button>`:''}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="container">
+          <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:300;margin-bottom:24px">Artwork <em>Details</em></h3>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:500px">
+            ${detailRow('Category',a.category||'—')}
+            ${detailRow('Category ID','#'+a.category_id)}
+            ${detailRow('Artwork ID','#'+a.artwork_id)}
+            ${detailRow('Artist ID','#'+a.artist_id)}
+          </div>
+          <div style="margin-top:24px">
+            <button class="btn btn-ghost" style="color:var(--ink);border-color:var(--parchment-mid)" onclick="showPage('explore'); window.scrollTo(0,0);">← Back to Gallery</button>
+          </div>
+        </div>
+      </div>
+    `;
+  } catch(e) {
+    document.getElementById('detailContent').innerHTML = '<div class="section"><div class="container"><div class="empty"><p>Could not load artwork</p></div></div></div>';
+  }
+}
+
+function detailRow(k,v) {
+  return `<div style="background:#fff;border:1px solid var(--parchment-mid);border-radius:var(--r);padding:14px 18px">
+    <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.8px;text-transform:uppercase;color:var(--ink-muted);margin-bottom:4px">${k}</div>
+    <div style="font-size:15px;font-weight:500">${v}</div>
+  </div>`;
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────
+function showDashboard() {
+  if (!currentUser) return showPage('login');
+  if (currentUser.role==='admin') { showPage('admin'); loadAdminDash(); }
+  else if (currentUser.role==='artist') { showPage('artist'); loadArtistDash(); }
+  else { showPage('visitor'); loadVisitorDash(); }
+  window.scrollTo(0,0);
+}
+
+async function loadAdminDash() {
+  try {
+    const [aw,eq,us] = await Promise.all([
+      fetch(`${API}/artworks/artist`).then(r=>r.json()),
+      fetch(`${API}/enquiry`).then(r=>r.json()),
+      fetch(`${API}/users`).then(r=>r.json())
+    ]);
+    const artworks = aw.data||[];
+    const enquiries = eq.data||[];
+    const users = us||[];
+    document.getElementById('adminMetrics').innerHTML = `
+      ${metricCard(artworks.length,'Total Artworks')}
+      ${metricCard(artworks.filter(a=>a.approval_status==='pending').length,'Pending Review')}
+      ${metricCard(enquiries.length,'Enquiries')}
+      ${metricCard(users.length,'Users')}
+    `;
+    document.getElementById('adminArtworksBody').innerHTML = artworks.map(a=>`<tr>
+      <td><span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--ink-muted)">#${a.artwork_id}</span></td>
+      <td><strong>${a.title||'Untitled'}</strong></td>
+      <td>${a.artist_name||'—'}</td>
+      <td>₹${Number(a.price||0).toLocaleString('en-IN')}</td>
+      <td><span class="badge status-${a.approval_status}">${a.approval_status}</span></td>
+      <td><div class="actions">
+        ${a.approval_status!=='approved'?`<button class="btn btn-sm" style="background:var(--green);color:#fff;padding:5px 12px;font-size:12px" onclick="updateStatus(${a.artwork_id},'approved')">Approve</button>`:''}
+        ${a.approval_status!=='rejected'?`<button class="btn btn-sm" style="background:var(--red);color:#fff;padding:5px 12px;font-size:12px" onclick="updateStatus(${a.artwork_id},'rejected')">Reject</button>`:''}
+        <button class="btn btn-sm" style="padding:5px 12px;font-size:12px;border:1px solid var(--parchment-mid)" onclick="deleteArtwork(${a.artwork_id})">Delete</button>
+      </div></td>
+    </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--ink-muted);padding:32px">No artworks</td></tr>';
+
+    document.getElementById('adminEnquiriesBody').innerHTML = enquiries.map(e=>`<tr>
+      <td><span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--ink-muted)">#${e.enquiry_id}</span></td>
+      <td>${e.name||'—'}<br><span style="font-size:11px;color:var(--ink-muted)">${e.email||''}</span></td>
+      <td>${e.artwork_title||'—'}</td>
+      <td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${e.message||'—'}</td>
+      <td><span class="badge status-${e.status}">${e.status}</span></td>
+    </tr>`).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--ink-muted);padding:32px">No enquiries</td></tr>';
+
+    document.getElementById('adminUsersBody').innerHTML = users.map(u=>`<tr>
+      <td><span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--ink-muted)">#${u.user_id}</span></td>
+      <td><strong>${u.name}</strong></td>
+      <td style="color:var(--ink-muted);font-size:13px">${u.email}</td>
+      <td><span class="badge" style="background:var(--parchment-dark);color:var(--ink-muted)">${u.role}</span></td>
+      <td><span class="badge status-approved">active</span></td>
+    </tr>`).join('');
+  } catch(e) {
+    document.getElementById('adminMetrics').innerHTML = metricCard('—','Server Offline');
+  }
+}
+
+async function loadArtistDash() {
+  try {
+    const r = await fetch(`${API}/artworks/artist/${currentUser.id}`);
+    const d = await r.json();
+    const artworks = d.data||[];
+    const approved = artworks.filter(a=>a.approval_status==='approved').length;
+    const pending = artworks.filter(a=>a.approval_status==='pending').length;
+    document.getElementById('artistMetrics').innerHTML = `
+      ${metricCard(artworks.length,'Total Artworks')}
+      ${metricCard(approved,'Approved')}
+      ${metricCard(pending,'Pending')}
+      ${metricCard(artworks.filter(a=>a.approval_status==='rejected').length,'Rejected')}
+    `;
+    document.getElementById('artistArtworksBody').innerHTML = artworks.map(a=>`<tr>
+      <td><strong>${a.title||'Untitled'}</strong></td>
+      <td>${a.category||'—'}</td>
+      <td>₹${Number(a.price||0).toLocaleString('en-IN')}</td>
+      <td><span class="badge status-${a.approval_status}">${a.approval_status}</span></td>
+      <td><button class="btn btn-sm" style="padding:5px 12px;font-size:12px;border:1px solid var(--parchment-mid)" onclick="showDetail(${a.artwork_id})">View</button></td>
+    </tr>`).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--ink-muted);padding:32px">No artworks yet. Upload your first one!</td></tr>';
+  } catch(e) {
+    document.getElementById('artistArtworksBody').innerHTML = '<tr><td colspan="5" style="text-align:center;padding:32px">Backend offline</td></tr>';
+  }
+}
+
+async function loadVisitorDash() {
+  try {
+    const r = await fetch(`${API}/artworks/approved`);
+    const d = await r.json();
+    const artworks = d.data||[];
+    document.getElementById('visitorGrid').innerHTML = artworks.map(a=>artworkCard(a)).join('') || '<div class="empty"><div class="empty-icon">◈</div><p>No approved artworks yet</p></div>';
+  } catch(e) {
+    document.getElementById('visitorGrid').innerHTML = '<div class="empty"><div class="empty-icon">◈</div><p>Backend offline</p></div>';
+  }
+}
+
+function metricCard(val, label) {
+  return `<div class="metric"><div class="metric-val">${val}</div><div class="metric-label">${label}</div></div>`;
+}
+
+
+// ── EXHIBITIONS ───────────────────────────────────────────────
+
+// A curated list of gallery and museum spaces for the exhibitions
+const exhibitionImages = [
+  'https://images.unsplash.com/photo-1536924940846-227afb31e2a5?w=800&q=80', // Gallery interior
+  'https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=800&q=80', // People looking at art
+  'https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?w=800&q=80', // Museum hall
+  // Minimalist & Architectural (Lots of breathing room)
+  'https://images.unsplash.com/photo-1577083552431-6e5fd01988ec?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1543857778-c4a1a3e0b2eb?auto=format&fit=crop&w=800&q=80',
+  
+  // Dramatic Lighting & Contemporary 
+  'https://images.unsplash.com/photo-1620023601555-52b11585eb93?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1578308434771-46903f54d193?auto=format&fit=crop&w=800&q=80',
+  
+  // Wide Open Museum Halls (Great for depth)
+  'https://images.unsplash.com/photo-1563811802951-db322cb4268e?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?auto=format&fit=crop&w=800&q=80',
+  
+  // Soft, Natural Light Galleries
+  'https://images.unsplash.com/photo-1560211516-7ceab4ba4f5f?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1574182245536-614634cb994f?auto=format&fit=crop&w=800&q=80'
+];
+
+function loadExhibitions() {
+  const exhibitions = [
+    {id:1,name:'Modern Art Expo',start:'Jan 1',end:'Jan 10'},
+    {id:2,name:'Colors of Nature',start:'Feb 1',end:'Feb 15'},
+    {id:3,name:'Abstract World',start:'Mar 5',end:'Mar 20'},
+    {id:4,name:'Digital Vision',start:'Apr 1',end:'Apr 12'},
+    {id:5,name:'Classic Creations',start:'May 1',end:'May 18'},
+    {id:6,name:'Urban Expressions',start:'Jun 1',end:'Jun 14'},
+    {id:7,name:'Heritage Art Show',start:'Jul 1',end:'Jul 15'},
+    {id:8,name:'Modern Masters',start:'Aug 1',end:'Aug 20'},
+    {id:9,name:'Creative Minds',start:'Sep 1',end:'Sep 10'},
+    {id:10,name:'Fusion Fest',start:'Oct 1',end:'Oct 25'}
+  ];
+  
+  const grid = document.getElementById('exhibitionsGrid');
+  if(grid) {
+    grid.innerHTML = exhibitions.map(e=>`
+      <div class="artwork-card" style="cursor:default">
+        <div class="card-art" style="background: url('${exhibitionImages[e.id % exhibitionImages.length]}') center/cover;">
+        </div>
+        <div class="card-body">
+          <div class="card-title">${e.name}</div>
+          <div class="card-artist" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--ink-muted)">${e.start} — ${e.end}, 2025</div>
+          <div class="card-footer">
+            <span class="badge status-approved">Active</span>
+            <span class="card-cat">Exhibition</span>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+// ── ADMIN ACTIONS ─────────────────────────────────────────────
+async function updateStatus(id, status) {
+  try {
+    const token = localStorage.getItem('token');
+    const r = await fetch(`${API}/artworks/${id}`,{method:'PUT',headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},body:JSON.stringify({approval_status:status})});
+    const d = await r.json();
+    if (d.success) { toast(`Artwork ${status}`,'success'); loadAdminDash(); }
+    else toast(d.error,'error');
+  } catch(e) { toast('Update failed','error'); }
+}
+
+async function deleteArtwork(id) {
+  if (!confirm('Delete this artwork permanently?')) return;
+  try {
+    const token = localStorage.getItem('token');
+    const r = await fetch(`${API}/artworks/${id}`,{method:'DELETE',headers:{'Authorization':`Bearer ${token}`}});
+    const d = await r.json();
+    if (d.success) { toast('Artwork deleted','info'); loadAdminDash(); }
+    else toast(d.error,'error');
+  } catch(e) { toast('Delete failed','error'); }
+}
+
+// ── UPLOAD ────────────────────────────────────────────────────
+function showUploadModal() { document.getElementById('uploadModal').style.display='block'; }
+function closeUploadModal(e) {
+  if (!e || e.target.classList.contains('modal-bg')) document.getElementById('uploadModal').style.display='none';
+}
+
+async function submitArtwork() {
+  const title = document.getElementById('uploadTitle').value.trim();
+  const price = parseFloat(document.getElementById('uploadPrice').value);
+  const category_id = document.getElementById('uploadCategory').value;
+  if (!title || !price || price<=0) return toast('Please fill title and valid price','error');
+  try {
+    const token = localStorage.getItem('token');
+    const r = await fetch(`${API}/artworks`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},body:JSON.stringify({user_id:currentUser.id,title,price,category_id:category_id||null})});
+    const d = await r.json();
+    if (d.success) {
+      toast('Artwork submitted for review!','success');
+      closeUploadModal();
+      document.getElementById('uploadTitle').value='';
+      document.getElementById('uploadPrice').value='';
+      loadArtistDash();
+    } else toast(d.error,'error');
+  } catch(e) { toast('Submission failed','error'); }
+}
+
+// ── ENQUIRY ───────────────────────────────────────────────────
+function openEnquiryModal(artworkId) {
+  if (!currentUser) { toast('Please log in to send enquiries','info'); return showPage('login'); }
+  document.getElementById('enquiryArtworkId').value = artworkId;
+  document.getElementById('enquiryMsg').value = '';
+  document.getElementById('enquiryModal').style.display = 'block';
+}
+function closeEnquiryModal(e) {
+  if (!e || e.target.classList.contains('modal-bg')) document.getElementById('enquiryModal').style.display='none';
+}
+
+async function submitEnquiry() {
+  const msg = document.getElementById('enquiryMsg').value.trim();
+  const artwork_id = document.getElementById('enquiryArtworkId').value;
+  if (!msg) return toast('Please write a message','error');
+  try {
+    const r = await fetch(`${API}/enquiry`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:currentUser.id,artwork_id,message:msg})});
+    const d = await r.json();
+    if (d.success) { toast('Enquiry sent!','success'); closeEnquiryModal(); }
+    else toast(d.error,'error');
+  } catch(e) { toast('Could not send enquiry','error'); }
+}
+
+// ── ROUTING ───────────────────────────────────────────────────
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const target = document.getElementById('page-'+name);
+  if (target) {
+    target.classList.add('active');
+    if (name==='explore') { 
+      loadExplore(); 
+      window.scrollTo(0,0); 
+    }
+    if (name==='login' || name==='register') {
+      window.scrollTo(0,0);
+    }
+  }
+}
+
+function switchTab(tabId, contentId) {
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById(contentId).classList.add('active');
+}
+
+// ── TOAST ─────────────────────────────────────────────────────
+function toast(msg, type='info') {
+  const c = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.textContent = msg;
+  c.appendChild(t);
+  setTimeout(()=>{ t.style.opacity='0'; t.style.transform='translateY(5px)'; t.style.transition='.3s'; setTimeout(()=>t.remove(),300); }, 3000);
+}
+
+init();
+</script>
+</body>
+</html>
